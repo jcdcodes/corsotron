@@ -14,8 +14,7 @@ var (
 type CorsHeaderResponseFilter struct {
 }
 
-func (f *CorsHeaderResponseFilter) FilterResponse(req *falcore.Request, res *http.Response) {
-	fmt.Println("setting a response header")
+func (f *CorsHeaderResponseFilter) FilterResponse(req *falcore.Request, res *http.Response){
 	res.Header.Set("Access-Control-Allow-Origin", "http://127.0.0.1:8000")
 }
 
@@ -25,7 +24,7 @@ func main() {
 	pipeline := falcore.NewPipeline()
 
 	pipeline.Upstream.PushBack(helloFilter)
-	pipeline.Downstream.PushBack(corsFilter)
+	pipeline.Downstream.PushBack(new(CorsHeaderResponseFilter))
 
 	server := falcore.NewServer(*port, pipeline)
 
@@ -33,8 +32,6 @@ func main() {
 		fmt.Println("failed to start server:", err)
 	}
 }
-
-var corsFilter = new(CorsHeaderResponseFilter)
 
 var helloFilter = falcore.NewRequestFilter(func(req *falcore.Request) *http.Response {
 	return falcore.StringResponse(req.HttpRequest, 200, nil, `
